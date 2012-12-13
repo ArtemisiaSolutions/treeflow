@@ -1,2 +1,83 @@
-treeflow
-========
+#TREEFLOW
+
+Treeflow is a Node.JS module to emit event in order to manage sequential or semi-sequential function.
+
+##USAGE
+
+All sequences are defined in a tree object like :
+
+    var sequentialFlow = {
+        name:"Sequential Flow",
+        execution: "sequential-independant",
+        children:[
+            {
+                name:"Action 1",
+                action:"action1",
+                execution: "sequential",
+                children:[
+                    {
+                        name:"Sub-Action 1 - 1",
+                        action:"subaction11",
+                        execution: "sequential",
+                        children:[
+                            {
+                                name:"Sub-Sub-Action 1",
+                                action:"subsubaction1"
+                            }
+                        ]
+                    },
+                    {
+                        name:"Sub-Action 1 - 2",
+                        action:"subaction12"
+                    }
+                ]
+            },
+            {
+                name:"Action 2",
+                action:"action2"
+            },
+            {
+                name:"Action 3",
+                action:"action3"
+            }
+        ]
+    }
+
+To init the flow :
+
+    var treeFlow = new TreeFlow(sequentialFlow)
+
+Next you need to declare listener :
+
+    treeFlow.on("action1", function(flow, action) {
+        console.log("running ["+action.name+"]")
+        console.log("flowData ["+flow.data.myData+"]")
+        flow.next()
+    })
+
+    treeFlow.on("action2", function(flow, action) {
+        console.log("running ["+action.name+"]")
+        flow.error(new Error("MyError"))
+    })
+    ...
+
+###General
+Treeflow will emit event for each actions in the configuration object (in example : `sequentialFlow`). All event are emitted sequentially. But you can choose to continue the sequence or not if a event failed.
+There are two types of execution :
+
+*   Sequential
+*   Sequential-independant
+
+See unit test for more details.
+
+####Sequential
+
+If you choose this execution type, all children event will be fired sequentially. If one of the children fails, event `complete` is fired and execution stop.
+In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither.
+
+####Sequential-independant
+
+If you choose this execution type, all children event will be fired sequentially. If one children fails, next children of its level is called.
+In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither but `action2` is called.
+
+
