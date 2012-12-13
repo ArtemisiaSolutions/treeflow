@@ -61,6 +61,10 @@ Next you need to declare listener :
     })
     ...
 
+To finish, run the flow :
+
+    treeFlow.run({myCtx:"This is a context object"})
+
 ###General
 Treeflow will emit event for each actions in the configuration object (in example : `sequentialFlow`). All event are emitted sequentially. But you can choose to continue the sequence or not if a event failed.
 There are two types of execution :
@@ -70,9 +74,22 @@ There are two types of execution :
 
 See unit test for more details.
 
+####Object details
+
+**Treeflow object :**
+
+*Arguments :*
+
+*   flowDefinition : Javascript object representig the tree of actions
+
+*Methods :*
+
+*   on(eventName, callback) : Listener of event `eventName`. When event is emitted, `callback`is called
+*   run(ctx) : Launch the flow with a context variable (optional)
+
 ####Sequential
 
-If you choose this execution type, all children event will be fired sequentially. If one of the children fails, event `complete` is fired and execution stop.
+If you choose this execution type, all children event will be emitted sequentially. If one of the children fails, event `complete` is fired and execution stop.
 In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither.
 
 ####Sequential-independant
