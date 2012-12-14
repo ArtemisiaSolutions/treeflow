@@ -87,6 +87,23 @@ See unit test for more details.
 *   on(eventName, callback) : Listener of event `eventName`. When event is emitted, `callback`is called
 *   run(ctx) : Launch the flow with a context variable (optional)
 
+*Events :*
+
+*   complete : Event emits when tree is finish. Emitted even if a `flow.error()` is called
+*   error(error,node) : Event emits when a `flow.error()` is called
+*   fatal(error,node) : Event emits when there is an error in the flow definition.
+
+**Flow object (argument of each listener) :**
+
+*Method :*
+
+*   next() : Launch the next event
+*   error() : Flow will continue if a sequential-independant flow is defined
+
+*Attributes :*
+
+*   ctx : Contains context passed in run arguments
+
 ####Sequential
 
 If you choose this execution type, all children event will be emitted sequentially. If one of the children fails, event `complete` is fired and execution stop.
@@ -96,5 +113,3 @@ In the given example if action `subaction11` failed, its children are not called
 
 If you choose this execution type, all children event will be fired sequentially. If one children fails, next children of its level is called.
 In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither but `action2` is called.
-
-
