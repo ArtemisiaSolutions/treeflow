@@ -2,7 +2,7 @@
     "name"                          : "treeflow",
     "description"                   : "Flow sequential dependant and independant",
     "author"                        : "Eric LEVEAU <leveau.eric@gmail.com>",
-    "version"                       : "0.0.8",
+    "version"                       : "0.0.9",
     "dependencies": {
         "winston":""
     },

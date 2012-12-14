@@ -201,10 +201,10 @@ describe("Treeflow",function(){
         })
     })
 
-    describe("Sequential independant",function(){
+    describe("Sequential independent",function(){
         describe("Only flow.next() called",function(){
             it("should run all activities",function(done){
-                var treeFlow = new TreeFlow(getSequentialIndependantConfig())
+                var treeFlow = new TreeFlow(getSequentialIndependentConfig())
                 var actionCalled = []
                 var errorCalled = false
                 var completeCalled = false
@@ -283,7 +283,7 @@ describe("Treeflow",function(){
         describe("flow.error() called",function(){
             describe("on a leaf node",function(){
                 it("should run all actions",function(done){
-                    var treeFlow = new TreeFlow(getSequentialIndependantConfig())
+                    var treeFlow = new TreeFlow(getSequentialIndependentConfig())
 
                     var actionCalled = []
                     var errorCalled = false
@@ -362,7 +362,7 @@ describe("Treeflow",function(){
 
             describe("on node with children",function(){
                 it("should run node at same level, but not its children",function(done){
-                    var treeFlow = new TreeFlow(getSequentialIndependantConfig())
+                    var treeFlow = new TreeFlow(getSequentialIndependentConfig())
 
                     var actionCalled = []
                     var errorCalled = false
@@ -489,20 +489,20 @@ function getSequentialConfig(){
     }
 }
 
-function getSequentialIndependantConfig(){
+function getSequentialIndependentConfig(){
     return {
-        name:"Sequential Independant Flow",
+        name:"Sequential Independent Flow",
         execution: "sequential",
         children:[
             {
                 name:"Action 1",
                 action:"action1",
-                execution: "sequential-independant",
+                execution: "sequential-independent",
                 children:[
                     {
                         name:"Sub-Action 1 - 1",
                         action:"subaction11",
-                        execution: "sequential-independant",
+                        execution: "sequential-independent",
                         children:[
                             {
                                 name:"Sub-Sub-Action 1",

@@ -8,7 +8,7 @@ All sequences are defined in a tree object like :
 
     var sequentialFlow = {
         name:"Sequential Flow",
-        execution: "sequential-independant",
+        execution: "sequential-independent",
         children:[
             {
                 name:"Action 1",
@@ -70,7 +70,7 @@ Treeflow will emit event for each actions in the configuration object (in exampl
 There are two types of execution :
 
 *   Sequential
-*   Sequential-independant
+*   Sequential-independent
 
 See unit test for more details.
 
@@ -98,7 +98,7 @@ See unit test for more details.
 *Method :*
 
 *   next() : Launch the next event
-*   error() : Flow will continue if a sequential-independant flow is defined
+*   error() : Flow will continue if a sequential-independent flow is defined
 
 *Attributes :*
 
@@ -109,7 +109,7 @@ See unit test for more details.
 If you choose this execution type, all children event will be emitted sequentially. If one of the children fails, event `complete` is fired and execution stop.
 In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither.
 
-####Sequential-independant
+####Sequential-independent
 
 If you choose this execution type, all children event will be fired sequentially. If one children fails, next children of its level is called.
 In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither but `action2` is called.
