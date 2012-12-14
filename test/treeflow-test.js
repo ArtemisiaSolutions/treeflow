@@ -160,7 +160,7 @@ describe("Treeflow",function(){
 
                 treeFlow.on("subsubaction1", function(flow,action) {
                     console.log("running ["+action.name+"]")
-                    //actionCalled.push(action.action)
+                    actionCalled.push(action.action)
                     flow.error("MyError")
                 })
 
@@ -180,8 +180,8 @@ describe("Treeflow",function(){
                     actionCalled.should.not.include("action3")
                     actionCalled.should.include("subaction11")
                     actionCalled.should.not.include("subaction12")
-                    actionCalled.should.not.include("subsubaction1")
-                    actionCalled.should.have.length(2)
+                    actionCalled.should.include("subsubaction1")
+                    actionCalled.should.have.length(3)
                     should.strictEqual(false, fatalCalled)
                     should.strictEqual(true, errorCalled)
                     should.strictEqual(true, completeCalled)
@@ -201,7 +201,253 @@ describe("Treeflow",function(){
         })
     })
 
+    describe("Sequential independant",function(){
+        describe("Only flow.next() called",function(){
+            it("should run all activities",function(done){
+                var treeFlow = new TreeFlow(getSequentialIndependantConfig())
+                var actionCalled = []
+                var errorCalled = false
+                var completeCalled = false
+                var fatalCalled = false
 
+                treeFlow.on("action1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("action2", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("action3", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("subaction11", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("subaction12", function(flow,action) {
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("subsubaction1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("error",function(err,action){
+                    if(err.message){
+                        console.log("error ["+err.message+"] event emit by action ["+action.name+"]")
+                    }
+                    errorCalled = true
+                })
+
+                treeFlow.on("complete",function(){
+                    console.log("tree is complete")
+                    completeCalled = true
+
+                    actionCalled.should.include("action1")
+                    actionCalled.should.include("action2")
+                    actionCalled.should.include("action3")
+                    actionCalled.should.include("subaction11")
+                    actionCalled.should.include("subaction12")
+                    actionCalled.should.include("subsubaction1")
+                    actionCalled.should.have.length(6)
+                    should.strictEqual(false, fatalCalled)
+                    should.strictEqual(false, errorCalled)
+                    should.strictEqual(true, completeCalled)
+
+                    done()
+                })
+
+                treeFlow.on("fatal",function(err,node){
+                    console.log("fatal error detected")
+                    fatalCalled = true
+                    done(err)
+                })
+
+                treeFlow.run({myData:"coucou"})
+            })
+        })
+
+        describe("flow.error() called",function(){
+            describe("on a leaf node",function(){
+                it("should run all actions",function(done){
+                    var treeFlow = new TreeFlow(getSequentialIndependantConfig())
+
+                    var actionCalled = []
+                    var errorCalled = false
+                    var completeCalled = false
+                    var fatalCalled = false
+
+                    treeFlow.on("action1", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("action2", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("action3", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.error(new Error("MyError"))
+                    })
+
+                    treeFlow.on("subaction11", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("subaction12", function(flow,action) {
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("subsubaction1", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.error(new Error("MyError"))
+                    })
+
+                    treeFlow.on("error",function(err,action){
+                        if(err.message){
+                            console.log("error ["+err.message+"] event emit by action ["+action.name+"]")
+                        }
+                        errorCalled = true
+                    })
+
+                    treeFlow.on("complete",function(){
+                        console.log("tree is complete")
+                        completeCalled = true
+
+                        actionCalled.should.include("action1")
+                        actionCalled.should.include("action2")
+                        actionCalled.should.include("action3")
+                        actionCalled.should.include("subaction11")
+                        actionCalled.should.include("subaction12")
+                        actionCalled.should.include("subsubaction1")
+                        actionCalled.should.have.length(6)
+                        should.strictEqual(false, fatalCalled)
+                        should.strictEqual(true, errorCalled)
+                        should.strictEqual(true, completeCalled)
+
+                        done()
+                    })
+
+                    treeFlow.on("fatal",function(err,node){
+                        console.log("fatal error detected"+err)
+                        fatalCalled = true
+                        done(err)
+                    })
+
+                    treeFlow.run({myData:"coucou"})
+                })
+            })
+
+            describe("on node with children",function(){
+                it("should run node at same level, but not its children",function(done){
+                    var treeFlow = new TreeFlow(getSequentialIndependantConfig())
+
+                    var actionCalled = []
+                    var errorCalled = false
+                    var completeCalled = false
+                    var fatalCalled = false
+
+                    treeFlow.on("action1", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("action2", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("action3", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("subaction11", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.error(new Error("MyError"))
+                    })
+
+                    treeFlow.on("subaction12", function(flow,action) {
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("subsubaction1", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
+
+                    treeFlow.on("error",function(err,action){
+                        if(err.message){
+                            console.log("error ["+err.message+"] event emit by action ["+action.name+"]")
+                        }
+                        errorCalled = true
+                    })
+
+                    treeFlow.on("complete",function(){
+                        console.log("tree is complete")
+                        completeCalled = true
+
+                        actionCalled.should.include("action1")
+                        actionCalled.should.include("action2")
+                        actionCalled.should.include("action3")
+                        actionCalled.should.include("subaction11")
+                        actionCalled.should.include("subaction12")
+                        actionCalled.should.not.include("subsubaction1")
+                        actionCalled.should.have.length(5)
+                        should.strictEqual(false, fatalCalled)
+                        should.strictEqual(true, errorCalled)
+                        should.strictEqual(true, completeCalled)
+
+                        done()
+                    })
+
+                    treeFlow.on("fatal",function(err,node){
+                        console.log("fatal error detected"+err)
+                        fatalCalled = true
+                        done(err)
+                    })
+
+                    treeFlow.run({myData:"coucou"})
+                })
+            })
+        })
+    })
+
+
+
+    describe("Sequential mixte",function(){
+        describe("Only flow.next()",function(){
+
+        })
+    })
 })
 
 function getSequentialConfig(){
@@ -218,6 +464,45 @@ function getSequentialConfig(){
                         name:"Sub-Action 1 - 1",
                         action:"subaction11",
                         execution: "sequential",
+                        children:[
+                            {
+                                name:"Sub-Sub-Action 1",
+                                action:"subsubaction1"
+                            }
+                        ]
+                    },
+                    {
+                        name:"Sub-Action 1 - 2",
+                        action:"subaction12"
+                    }
+                ]
+            },
+            {
+                name:"Action 2",
+                action:"action2"
+            },
+            {
+                name:"Action 3",
+                action:"action3"
+            }
+        ]
+    }
+}
+
+function getSequentialIndependantConfig(){
+    return {
+        name:"Sequential Independant Flow",
+        execution: "sequential",
+        children:[
+            {
+                name:"Action 1",
+                action:"action1",
+                execution: "sequential-independant",
+                children:[
+                    {
+                        name:"Sub-Action 1 - 1",
+                        action:"subaction11",
+                        execution: "sequential-independant",
                         children:[
                             {
                                 name:"Sub-Sub-Action 1",
