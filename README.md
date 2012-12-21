@@ -93,7 +93,7 @@ See unit test for more details.
 *   complete : Event emits when tree is finish. Emitted even if a `flow.error()` is called
 *   error(error,node) : Event emits when a `flow.error()` is called
 *   fatal(error,node) : Event emits when there is an error in the flow definition.
-*   stop : Event emits when treeflow.stop()` is called
+*   stop : Event emits when `treeflow.stop()` is called
 
 **Flow object (argument of each listener) :**
 
