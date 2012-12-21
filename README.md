@@ -85,13 +85,15 @@ See unit test for more details.
 *Methods :*
 
 *   on(eventName, callback) : Listener of event `eventName`. When event is emitted, `callback`is called
-*   run(ctx) : Launch the flow with a context variable (optional)
+*   run(ctx) : Launch the flow with a context variable (optional)`
+*   stop() : Stop the flow ans emit `stop` event
 
 *Events :*
 
 *   complete : Event emits when tree is finish. Emitted even if a `flow.error()` is called
 *   error(error,node) : Event emits when a `flow.error()` is called
 *   fatal(error,node) : Event emits when there is an error in the flow definition.
+*   stop : Event emits when treeflow.stop()` is called
 
 **Flow object (argument of each listener) :**
 

@@ -199,6 +199,79 @@ describe("Treeflow",function(){
 
             })
         })
+        describe("Stop flow",function(){
+            it("should stop tree run",function(done){
+                var treeFlow = new TreeFlow(getSequentialConfig())
+
+                var actionCalled = []
+                var errorCalled = false
+                var completeCalled = false
+                var fatalCalled = false
+                var stopCalled = false
+
+                treeFlow.on("action1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("action2", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    treeFlow.stop();
+                    flow.next()
+                })
+
+                treeFlow.on("action3", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("subaction11", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("subaction12", function(flow,action) {
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("subsubaction1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+
+                treeFlow.on("error",function(err,action){
+                    if(err.message){
+                        console.log("error ["+err.message+"] event emit by action ["+action.name+"]")
+                    }
+                    errorCalled = true
+                })
+
+                treeFlow.on("complete",function(){
+                    console.log("should not be complete")
+                    completeCalled = true
+                    done(new Error("Should not be complte"))
+                })
+
+                treeFlow.on("fatal",function(err,node){
+                    console.log("fatal error detected"+err)
+                    fatalCalled = true
+                    done(err)
+                })
+                treeFlow.on("stop",function(){
+                    console.log("treeflow stopped")
+                    stopCalled = true
+                    done()
+                })
+
+                treeFlow.run({myData:"coucou"})
+            })
+        })
     })
 
     describe("Sequential independent",function(){
@@ -441,8 +514,6 @@ describe("Treeflow",function(){
         })
     })
 
-
-
     describe("Sequential mixte",function(){
         describe("Only flow.next()",function(){
 
@@ -527,4 +598,3 @@ function getSequentialIndependentConfig(){
         ]
     }
 }
-
