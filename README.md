@@ -8,37 +8,28 @@ All sequences are defined in a tree object like :
 
     var sequentialFlow = {
         name:"Sequential Flow",
-        execution: "sequential-independent",
-        children:[
+        tasks:[
             {
-                name:"Action 1",
-                action:"action1",
-                execution: "sequential",
-                children:[
+                name:"action1",
+                tasks:[
                     {
-                        name:"Sub-Action 1 - 1",
-                        action:"subaction11",
-                        execution: "sequential",
-                        children:[
+                        name:"subaction11",
+                        tasks:[
                             {
-                                name:"Sub-Sub-Action 1",
-                                action:"subsubaction1"
+                                name:"subsubaction1"
                             }
                         ]
                     },
                     {
-                        name:"Sub-Action 1 - 2",
-                        action:"subaction12"
+                        name:"subaction12"
                     }
                 ]
             },
             {
-                name:"Action 2",
-                action:"action2"
+                name:"action2"
             },
             {
-                name:"Action 3",
-                action:"action3"
+                name:"action3"
             }
         ]
     }
@@ -66,11 +57,7 @@ To finish, run the flow :
     treeFlow.run({myCtx:"This is a context object"})
 
 ###General
-Treeflow will emit event for each actions in the configuration object (in example : `sequentialFlow`). All event are emitted sequentially. But you can choose to continue the sequence or not if a event failed.
-There are two types of execution :
-
-*   Sequential
-*   Sequential-independent
+Treeflow will emit event for each actions in the configuration object (in example : `sequentialFlow`). All event are emitted sequentially. But if you have several tasks in tasks array, if one of task present in this array fails, the next one will be launched.
 
 See unit test for more details.
 
@@ -108,10 +95,8 @@ See unit test for more details.
 
 ####Sequential
 
-If you choose this execution type, all children event will be emitted sequentially. If one of the children fails, event `complete` is fired and execution stop.
-In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither.
+In exemple, action1, subaction11 and subsubaction1 are sequential, if one on them fails, the other will not be called.
 
 ####Sequential-independent
 
-If you choose this execution type, all children event will be fired sequentially. If one children fails, next children of its level is called.
-In the given example if action `subaction11` failed, its children are not called, and action `subaction12` neither but `action2` is called.
+In exemple action1, action2 and action3 are independant, if one of them fails, the other one will be called. It's the same thing for subaction11 and subaction12.
