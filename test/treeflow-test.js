@@ -10,7 +10,7 @@ describe("Treeflow",function(){
                 var treeFlow = new TreeFlow({name:"No children flow",execution: "sequential",children:""})
 
                 treeFlow.on("fatal",function(err,node){
-                    err.name.should.equal("NotFoundChildrenError");
+                    err.name.should.equal("NotFoundTasksError");
                     done()
                 })
 
@@ -55,25 +55,14 @@ describe("Treeflow",function(){
                     flow.next()
                 })
 
-                treeFlow.on("action2", function(flow,action) {
-                    console.log("running ["+action.name+"]")
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
-                treeFlow.on("action3", function(flow,action) {
-                    console.log("running ["+action.name+"]")
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
                 treeFlow.on("subaction11", function(flow,action) {
                     console.log("running ["+action.name+"]")
                     actionCalled.push(action.action)
                     flow.next()
                 })
-
-                treeFlow.on("subaction12", function(flow,action) {
+                
+                treeFlow.on("subsusubbaction1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
                     actionCalled.push(action.action)
                     flow.next()
                 })
@@ -96,12 +85,10 @@ describe("Treeflow",function(){
                     completeCalled = true
 
                     actionCalled.should.include("action1")
-                    actionCalled.should.include("action2")
-                    actionCalled.should.include("action3")
                     actionCalled.should.include("subaction11")
-                    actionCalled.should.include("subaction12")
+                    actionCalled.should.include("subsusubbaction1")
                     actionCalled.should.include("subsubaction1")
-                    actionCalled.should.have.length(6)
+                    actionCalled.should.have.length(4)
                     should.strictEqual(false, fatalCalled)
                     should.strictEqual(false, errorCalled)
                     should.strictEqual(true, completeCalled)
@@ -134,34 +121,24 @@ describe("Treeflow",function(){
                     actionCalled.push(action.action)
                     flow.next()
                 })
-
-                treeFlow.on("action2", function(flow,action) {
-                    console.log("running ["+action.name+"]")
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
-                treeFlow.on("action3", function(flow,action) {
-                    console.log("running ["+action.name+"]")
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
+                
                 treeFlow.on("subaction11", function(flow,action) {
                     console.log("running ["+action.name+"]")
                     actionCalled.push(action.action)
                     flow.next()
                 })
 
-                treeFlow.on("subaction12", function(flow,action) {
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
 
                 treeFlow.on("subsubaction1", function(flow,action) {
                     console.log("running ["+action.name+"]")
                     actionCalled.push(action.action)
                     flow.error("MyError")
+                })
+                
+                treeFlow.on("subsusubbaction1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
                 })
 
                 treeFlow.on("error",function(err,action){
@@ -176,11 +153,9 @@ describe("Treeflow",function(){
                     completeCalled = true
 
                     actionCalled.should.include("action1")
-                    actionCalled.should.not.include("action2")
-                    actionCalled.should.not.include("action3")
                     actionCalled.should.include("subaction11")
-                    actionCalled.should.not.include("subaction12")
                     actionCalled.should.include("subsubaction1")
+                    actionCalled.should.not.include("subsubsubaction1")
                     actionCalled.should.have.length(3)
                     should.strictEqual(false, fatalCalled)
                     should.strictEqual(true, errorCalled)
@@ -215,31 +190,20 @@ describe("Treeflow",function(){
                     flow.next()
                 })
 
-                treeFlow.on("action2", function(flow,action) {
+                treeFlow.on("subaction11", function(flow,action) {
                     console.log("running ["+action.name+"]")
                     actionCalled.push(action.action)
                     treeFlow.stop();
                     flow.next()
                 })
 
-                treeFlow.on("action3", function(flow,action) {
-                    console.log("running ["+action.name+"]")
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
-                treeFlow.on("subaction11", function(flow,action) {
-                    console.log("running ["+action.name+"]")
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
-                treeFlow.on("subaction12", function(flow,action) {
-                    actionCalled.push(action.action)
-                    flow.next()
-                })
-
                 treeFlow.on("subsubaction1", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
+                
+                treeFlow.on("subsusubbaction1", function(flow,action) {
                     console.log("running ["+action.name+"]")
                     actionCalled.push(action.action)
                     flow.next()
@@ -317,6 +281,12 @@ describe("Treeflow",function(){
                     actionCalled.push(action.action)
                     flow.next()
                 })
+                
+                treeFlow.on("subsubaction2", function(flow,action) {
+                    console.log("running ["+action.name+"]")
+                    actionCalled.push(action.action)
+                    flow.next()
+                })
 
                 treeFlow.on("error",function(err,action){
                     if(err.message){
@@ -335,7 +305,8 @@ describe("Treeflow",function(){
                     actionCalled.should.include("subaction11")
                     actionCalled.should.include("subaction12")
                     actionCalled.should.include("subsubaction1")
-                    actionCalled.should.have.length(6)
+                    actionCalled.should.include("subsubaction2")
+                    actionCalled.should.have.length(7)
                     should.strictEqual(false, fatalCalled)
                     should.strictEqual(false, errorCalled)
                     should.strictEqual(true, completeCalled)
@@ -397,6 +368,11 @@ describe("Treeflow",function(){
                         actionCalled.push(action.action)
                         flow.error(new Error("MyError"))
                     })
+                    treeFlow.on("subsubaction2", function(flow,action) {
+                        console.log("running ["+action.name+"]")
+                        actionCalled.push(action.action)
+                        flow.next()
+                    })
 
                     treeFlow.on("error",function(err,action){
                         if(err.message){
@@ -415,7 +391,9 @@ describe("Treeflow",function(){
                         actionCalled.should.include("subaction11")
                         actionCalled.should.include("subaction12")
                         actionCalled.should.include("subsubaction1")
-                        actionCalled.should.have.length(6)
+                        actionCalled.should.include("subsubaction2")
+                        
+                        actionCalled.should.have.length(7)
                         should.strictEqual(false, fatalCalled)
                         should.strictEqual(true, errorCalled)
                         should.strictEqual(true, completeCalled)
@@ -524,37 +502,24 @@ describe("Treeflow",function(){
 function getSequentialConfig(){
     return {
         name:"Sequential Flow",
-        execution: "sequential",
-        children:[
+        tasks:[
             {
-                name:"Action 1",
-                action:"action1",
-                execution: "sequential",
-                children:[
+                name:"action1",
+                tasks:[
                     {
-                        name:"Sub-Action 1 - 1",
-                        action:"subaction11",
-                        execution: "sequential",
-                        children:[
+                        name:"subaction11",
+                        tasks:[
                             {
-                                name:"Sub-Sub-Action 1",
-                                action:"subsubaction1"
+                                name:"subsubaction1",
+                                tasks:[
+                                {
+                                    name:"subsusubbaction1"
+                                }
+                                ]
                             }
                         ]
-                    },
-                    {
-                        name:"Sub-Action 1 - 2",
-                        action:"subaction12"
                     }
                 ]
-            },
-            {
-                name:"Action 2",
-                action:"action2"
-            },
-            {
-                name:"Action 3",
-                action:"action3"
             }
         ]
     }
@@ -563,37 +528,31 @@ function getSequentialConfig(){
 function getSequentialIndependentConfig(){
     return {
         name:"Sequential Independent Flow",
-        execution: "sequential",
-        children:[
+        tasks:[
             {
-                name:"Action 1",
-                action:"action1",
-                execution: "sequential-independent",
-                children:[
+                name:"action1",
+                tasks:[
                     {
-                        name:"Sub-Action 1 - 1",
-                        action:"subaction11",
-                        execution: "sequential-independent",
-                        children:[
+                        name:"subaction11",
+                        tasks:[
                             {
-                                name:"Sub-Sub-Action 1",
-                                action:"subsubaction1"
+                                name:"subsubaction1"
+                            },
+                             {
+                                name:"subsubaction2"
                             }
                         ]
                     },
                     {
-                        name:"Sub-Action 1 - 2",
-                        action:"subaction12"
+                        name:"subaction12"
                     }
                 ]
             },
             {
-                name:"Action 2",
-                action:"action2"
+                name:"action2"
             },
             {
-                name:"Action 3",
-                action:"action3"
+                name:"action3"
             }
         ]
     }
